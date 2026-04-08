@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>车载冰箱制造 | PMO智能交付中心 · 专业版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #eef2f7;
+            font-family: 'Inter', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 30px 24px;
+            color: #1a2c3e;
+        }
+        .pmo-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        /* 头部渐变区域 */
+        .header {
+            background: linear-gradient(115deg, #0a2e44 0%, #144d6b 100%);
+            border-radius: 32px;
+            padding: 24px 32px;
+            margin-bottom: 28px;
+            color: white;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+        }
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .header h1 small {
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-weight: normal;
+        }
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(2px);
+            border-radius: 28px;
+            padding: 12px 20px;
+            min-width: 140px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        /* 通用卡片 */
+        .card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+            margin-bottom: 32px;
+            overflow: hidden;
+            border: 1px solid #e6edf4;
+        }
+        .card-header {
+            padding: 18px 28px;
+            background: #fafdff;
+            border-bottom: 1px solid #eef3fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card-header h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: #1b4f72;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .badge-count {
+            background: #e2f0fa;
+            color: #146b3a;
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        /* 表格容器与固定布局优化 */
+        .project-table-wrapper {
+            overflow-x: auto;
+            padding: 0 0 8px 0;
+        }
+        .project-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 1100px;
+            table-layout: fixed;
+        }
+        .project-table th:nth-child(1),
+        .project-table td:nth-child(1) { width: 18%; }
+        .project-table th:nth-child(2),
+        .project-table td:nth-child(2) { width: 18%; }
+        .project-table th:nth-child(3),
+        .project-table td:nth-child(3) { width: 18%; }
+        .project-table th:nth-child(4),
+        .project-table td:nth-child(4) { width: 30%; }
+        .project-table th:nth-child(5),
+        .project-table td:nth-child(5) { width: 8%; }
+        .project-table th:nth-child(6),
+        .project-table td:nth-child(6) { width: 8%; }
+
+        .project-table th {
+            text-align: left;
+            padding: 16px 16px;
+            background: #f8fafc;
+            color: #2c5a7a;
+            font-weight: 600;
+            border-bottom: 1px solid #e2edf2;
+            vertical-align: middle;
+        }
+        .project-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #ecf3f8;
+            vertical-align: top;
+            word-break: break-word;
+        }
+        .deliverable-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 2px 0;
+        }
+        .deliverable-tag {
+            background: #eff6ff;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #166534;
+            cursor: help;
+            white-space: nowrap;
+        }
+        .deliverable-tag.exempt {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 3px solid #f59e0b;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .status-active { background: #fff3e0; color: #b45309; }
+        .status-completed { background: #e0f2e9; color: #0f6e3f; }
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin: 0 4px;
+            padding: 6px;
+            border-radius: 30px;
+            transition: 0.1s;
+        }
+        .btn-icon:hover { background: #eef2f8; }
+        .btn-sm {
+            background: #eef2fa;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-sm-primary {
+            background: #1f6392;
+            color: white;
+        }
+        .btn-sm-primary:hover { background: #0a4b73; }
+        .control-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 16px;
+            background: white;
+            border-radius: 28px;
+            padding: 18px 28px;
+            margin-bottom: 28px;
+            border: 1px solid #e6edf4;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-group label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #5a7a9a;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 20px;
+            border: 1px solid #cbdde9;
+            font-size: 0.85rem;
+            background: white;
+        }
+        .reminder-toggle-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .reminder-mode-btn {
+            background: #eef2fa;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .reminder-mode-btn.active {
+            background: #1f6392;
+            color: white;
+        }
+        .reminder-area {
+            background: #fefcf5;
+        }
+        .reminder-list {
+            padding: 8px 8px 20px 8px;
+        }
+        .reminder-item {
+            background: white;
+            margin: 16px 20px;
+            border-radius: 24px;
+            padding: 20px 24px;
+            border-left: 8px solid #e67e22;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+        .reminder-item.overdue {
+            border-left-color: #c0392b;
+            background: #fff8f6;
+        }
+        .reminder-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .deliverable-detail {
+            background: #fafcfd;
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin-top: 12px;
+        }
+        .deliverable-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .deliverable-item {
+            background: #eef2fa;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+        .deliverable-item.incomplete {
+            background: #ffe6e5;
+            color: #b91c1c;
+        }
+        .deliverable-item.exempt {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .empty-reminder {
+            text-align: center;
+            padding: 48px 20px;
+            color: #6c8eaa;
+        }
+        .footer-note {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #6c86a3;
+            margin-top: 24px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            max-width: 1000px;
+            width: 90%;
+            border-radius: 36px;
+            padding: 28px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            color: #1f4e6e;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 24px;
+            border: 1px solid #cbdde9;
+            font-size: 0.9rem;
+        }
+        .deliverable-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            background: #f9fafc;
+            padding: 10px;
+            border-radius: 24px;
+        }
+        .deliverable-row .deliv-name {
+            flex: 2;
+            min-width: 180px;
+        }
+        .deliverable-row input, .deliverable-row select {
+            font-size: 0.8rem;
+            border-radius: 20px;
+            padding: 6px 8px;
+        }
+        .exempt-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .exempt-reason-area {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .other-reason-input {
+            padding: 5px 8px;
+            border-radius: 20px;
+            border: 1px solid #cbdde9;
+            font-size: 0.75rem;
+            width: 160px;
+        }
+        .add-deliverable {
+            background: #eef2fa;
+            border: dashed 1px #8ba5c2;
+            border-radius: 40px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        .change-log {
+            background: #fef9e6;
+            border-left: 5px solid #f5b042;
+            margin: 0 20px 20px 20px;
+            padding: 14px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .remove-deliv {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+        }
+        .project-table td:first-child strong {
+            font-weight: 700;
+            color: #0c4e6e;
+        }
+    </style>
+</head>
+<body>
+<div class="pmo-container">
+    <div class="header">
+        <h1>🧊 PMO项目结项智能中心 <small>豁免原因：信息安全 / 数据安全 / 问题闭环 / 外部原因 / 其他</small></h1>
+        <p>📌 基于实际交付件清单，豁免须注明原因 | 支持实时筛选、全局待办、一键追溯</p>
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="stat-number" id="totalProjects">0</div><div class="stat-label">总项目数</div></div>
+            <div class="stat-card"><div class="stat-number" id="activeProjects">0</div><div class="stat-label">进行中</div></div>
+            <div class="stat-card"><div class="stat-number" id="overdueProjects">0</div><div class="stat-label">逾期未结项</div></div>
+            <div class="stat-card"><div class="stat-number" id="pendingDeliverables">0</div><div class="stat-label">待办交付件</div></div>
+        </div>
+    </div>
+
+    <div class="control-bar">
+        <div class="filter-group"><label>🔍 项目名称</label><input type="text" id="searchNameInput" placeholder="输入关键词..."></div>
+        <div class="filter-group"><label>👤 项目经理</label><input type="text" id="searchManagerInput" placeholder="项目经理"></div>
+        <div class="filter-group"><label>📌 状态</label><select id="statusFilter"><option value="all">全部</option><option value="active">进行中</option><option value="completed">已结项</option></select></div>
+        <div class="filter-group"><label>📅 提醒月份</label><input type="month" id="reminderMonth" value="2026-04"></div>
+        <div class="reminder-toggle-group">
+            <button id="monthlyReminderBtn" class="reminder-mode-btn active">📆 月度提醒</button>
+            <button id="globalTodoBtn" class="reminder-mode-btn">⚠️ 全局待办清单</button>
+        </div>
+        <button id="openAddProjectBtn" class="btn-sm btn-sm-primary">+ 新建项目</button>
+    </div>
+
+    <div id="changeLogContainer" class="change-log" style="display: none;"></div>
+
+    <div class="card">
+        <div class="card-header"><h2>📋 项目交付清单 <span class="badge-count" id="projectCount">0</span></h2><span style="font-size:0.7rem;">🟡豁免交付件标注原因 | 支持编辑/删除</span></div>
+        <div class="project-table-wrapper">
+            <table class="project-table">
+                <thead>
+                    <tr><th>项目名称</th><th>结项时间</th><th>项目经理</th><th>交付件摘要 (已提交/总量)</th><th>状态</th><th>操作</th></tr>
+                </thead>
+                <tbody id="projectTableBody">加载中...</tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card reminder-area">
+        <div class="card-header"><h2>⏰ 结项督办清单 · 交付件智能跟踪</h2></div>
+        <div id="reminderResult" class="reminder-list"><div class="empty-reminder">👈 选择月份或切换到「全局待办清单」</div></div>
+    </div>
+    <div class="footer-note">✅ 豁免原因「信息安全/数据安全/问题闭环/外部原因/其他」豁免项不计入催办 | 所有变更自动保存，表格列宽已优化</div>
+</div>
+
+<div id="projectModal" class="modal">
+    <div class="modal-content">
+        <div class="flex-between"><span id="modalTitle" style="font-weight:700;">编辑项目</span><button style="background:none;border:none;font-size:1.5rem;" id="closeModalBtn">&times;</button></div>
+        <div id="modalBody">
+            <div class="form-group"><label>项目名称 *</label><input type="text" id="projName"></div>
+            <div class="form-group"><label>项目经理</label><input type="text" id="projManager"></div>
+            <div class="form-group"><label>结项日期 *</label><input type="date" id="projDueDate"></div>
+            <div class="form-group"><label>📦 交付件明细</label><div id="deliverablesContainer"></div><div class="add-deliverable" id="addDeliverableBtn">+ 添加交付件</div><small>💡 勾选“豁免”后必须选择原因（信息安全/数据安全/问题闭环/外部原因/其他），其他可自定义填写原因，豁免项不计入催办。</small></div>
+            <div class="form-group"><label>项目状态</label><select id="projStatus"><option value="active">进行中 (未结项)</option><option value="completed">已结项 (不再提醒)</option></select></div>
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;"><button id="saveProjectBtn" class="btn-sm btn-sm-primary">保存项目</button><button id="cancelModalBtn" class="btn-sm">取消</button></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- 豁免原因格式化 (新增外部原因+其他) ----------
+    function formatExemptReason(reason) {
+        if (!reason) return '豁免';
+        if (reason === '信息安全') return '🔒 信息安全豁免';
+        if (reason === '数据安全') return '🛡️ 数据安全豁免';
+        if (reason === '问题实际已闭环') return '✅ 问题实际已闭环';
+        if (reason === '外部原因') return '🌐 外部原因';
+        if (reason.startsWith('其他:')) return `✏️ 其他: ${reason.substring(3)}`;
+        if (reason === '其他') return '其他原因';
+        return reason;
+    }
+
+    // 构建原始数据集
+    function buildFullProjects() { return [
+        { id: 1001, name: "MES追溯系统的完善", manager: "徐冬梅", dueDate: "2025-09-30", status: "active", dueDateHistory: [], deliverables: [ { name: "《MES追溯系统的完善项目计划书》", quantity:1, submittedCount:1, exempt:false, exemptReason:"" },{ name: "《MES追溯系统现状评估与差距分析报告1》", quantity:1, submittedCount:1, exempt:false },{ name: "《MES追溯系统现状评估与差距分析报告2》", quantity:1, submittedCount:1, exempt:false },{ name: "《MES追溯系统现状评估与差距分析报告3》", quantity:1, submittedCount:1, exempt:false },{ name: "《MES追溯系统现状评估与差距分析报告4》", quantity:1, submittedCount:1, exempt:false },{ name: "《零部件追溯标识管控流程》", quantity:1, submittedCount:1, exempt:false },{ name: "《追溯业务流程SOP及异常处理指引》", quantity:1, submittedCount:1, exempt:false },{ name: "《系统性能优化（查询速度达标）》", quantity:1, submittedCount:0, exempt:false, remark:"达标无需优化" },{ name: "《关键工艺参数采集优化方案》", quantity:1, submittedCount:0, exempt:false, remark:"无需进行" },{ name: "《核心数据分析报表开发完成》", quantity:1, submittedCount:0, exempt:false, remark:"无需进行" },{ name: "《MOM系统报表目录清单》", quantity:1, submittedCount:0, exempt:false },{ name: "《项目总结》", quantity:1, submittedCount:1, exempt:false },{ name: "《月度会议纪要》", quantity:1, submittedCount:1, exempt:false },{ name: "附录《通用精准&批次追溯清单》(3)", quantity:1, submittedCount:1, exempt:false },{ name: "零部件链路追溯查询方式", quantity:1, submittedCount:1, exempt:false } ] },
+        { id: 1002, name: "JIT项目计划书", manager: "珈寅", dueDate: "2025-10-31", status: "active", dueDateHistory: [], deliverables: [ { name: "《JIT项目计划书》", quantity:1, submittedCount:1, exempt:false },{ name: "《项目合同》", quantity:1, submittedCount:0, exempt:true, exemptReason:"信息安全" },{ name: "《英得尔原材料入厂JIT设计方案》", quantity:1, submittedCount:1, exempt:false },{ name: "《英得尔供应商JIT送货协议》", quantity:1, submittedCount:1, exempt:false },{ name: "《英得尔可回收包材回收管理规定》", quantity:1, submittedCount:1, exempt:false },{ name: "《关于供应商可回收包材回收要求的通知》", quantity:1, submittedCount:1, exempt:false },{ name: "《供应商原材料送VMI仓系统操作说明》", quantity:1, submittedCount:1, exempt:false },{ name: "《英得尔VMI仓收货标准》", quantity:1, submittedCount:1, exempt:false },{ name: "《英得尔JIT暂存库作业指导书》", quantity:1, submittedCount:1, exempt:false },{ name: "《英得尔原材料仓6S管理规定》", quantity:1, submittedCount:1, exempt:false },{ name: "《英得尔原材料仓品质管理规定》", quantity:1, submittedCount:1, exempt:false },{ name: "《英得尔原材料仓安全管理规定》", quantity:1, submittedCount:1, exempt:false },{ name: "《配送组异常响应制度》", quantity:1, submittedCount:1, exempt:false },{ name: "《配送组齐套复核制度》", quantity:1, submittedCount:1, exempt:false },{ name: "《配送组绩效考核方案试行稿》", quantity:1, submittedCount:1, exempt:false },{ name: "《项目总结报告》", quantity:1, submittedCount:1, exempt:false },{ name: "《周度会议纪要》", quantity:1, submittedCount:1, exempt:false },{ name: "《英得尔&满仓 JIT项目计划进度表1230》", quantity:1, submittedCount:1, exempt:false } ] },
+        { id: 1003, name: "员工优点共识项目", manager: "王海怡", dueDate: "2025-10-31", status: "active", dueDateHistory: [], deliverables: [ { name: "《周度会议纪要》", quantity:1, submittedCount:1 },{ name: "《员工优点共识项目计划书》", quantity:1, submittedCount:1 },{ name: "《一对一沟通指引与问题清单》", quantity:1, submittedCount:1 },{ name: "《员工优点信息收集表》", quantity:1, submittedCount:1 },{ name: "《全员沟通日程表》", quantity:1, submittedCount:1 },{ name: "《员工优点共识项目总结报告》", quantity:1, submittedCount:1 },{ name: "《员工优点共识项目关键路径》", quantity:1, submittedCount:1 } ] },
+        { id: 1004, name: "园区着装与户外交通行为规范项目", manager: "杨艳芬", dueDate: "2025-11-30", status: "active", deliverables: [ { name: "《管理规范共识稿》", quantity:1, submittedCount:1 },{ name: "《项目计划书》", quantity:1, submittedCount:1 },{ name: "《每日违规人员通报》", quantity:1, submittedCount:1 },{ name: "《周度小结》", quantity:1, submittedCount:1 },{ name: "《周度小结（核心骨干群）》", quantity:1, submittedCount:1 },{ name: "《违规数据统计趋势图》", quantity:1, submittedCount:1 },{ name: "《项目总结报告》", quantity:1, submittedCount:1 },{ name: "《月度会议纪要》", quantity:1, submittedCount:1 } ] }
+    ]; }
+
+    let projects = []; const STORAGE_KEY = "pmo_enhanced_v2";
+    function saveToLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(projects)); renderFilteredTable(); updateStats(); renderChangeLog(); refreshReminderByMode(); }
+    function loadProjects() { let stored = localStorage.getItem(STORAGE_KEY); if(stored) { projects = JSON.parse(stored); projects.forEach(p=>{ p.deliverables.forEach(d=>{ if(d.exempt && !d.exemptReason) d.exemptReason="信息安全"; if(!d.exemptReason) d.exemptReason=""; }); if(!p.dueDateHistory) p.dueDateHistory=[]; }); } else { projects = buildFullProjects(); saveToLocal(); } renderFilteredTable(); updateStats(); renderChangeLog(); }
+    
+    let currentReminderMode = 'monthly';
+    function refreshReminderByMode() { const monthVal = document.getElementById('reminderMonth').value; if(currentReminderMode === 'monthly' && monthVal) renderMonthlyReminder(monthVal); else if(currentReminderMode === 'global') renderGlobalTodo(); }
+    function renderMonthlyReminder(monthStr) { let [year,month]=monthStr.split('-').map(Number); let activeProjects = projects.filter(p=>p.status==='active'); let filtered = activeProjects.filter(p=>{let d=new Date(p.dueDate); return d.getFullYear()===year && d.getMonth()+1===month;}); if(filtered.length===0){document.getElementById('reminderResult').innerHTML='<div class="empty-reminder">📭 所选月份无到期项目</div>';return;} let html=''; filtered.forEach(p=>{ let dueObj=new Date(p.dueDate); let isOverdue=dueObj<new Date(); let totalMissing=0; let itemsHtml=''; p.deliverables.forEach(d=>{ let missing=d.exempt?0:Math.max(0,d.quantity-d.submittedCount); totalMissing+=missing; let cls='',txt=''; if(d.exempt){ cls='exempt'; txt=formatExemptReason(d.exemptReason); } else if(missing>0){ cls='incomplete'; txt='⚠️未完成'; } else { txt='✅已完成'; } itemsHtml+=`<div class="deliverable-item ${cls}">📄 ${escapeHtml(d.name)} (${d.submittedCount}/${d.quantity}) ${txt}</div>`; }); html+=`<div class="reminder-item ${isOverdue?'overdue':''}"><div class="reminder-title"><span>📌 ${escapeHtml(p.name)}</span><span>结项: ${p.dueDate} ${isOverdue?'逾期':''}</span></div><div class="deliverable-detail"><div class="deliverable-items">${itemsHtml}</div>${totalMissing>0?`<div style="margin-top:12px;color:#b91c1c;">⚠️ 尚有 ${totalMissing} 份交付件未完成</div>`:`<div style="margin-top:12px;color:#2e7d64;">✅ 所有必要交付件已完成</div>`}</div></div>`; }); document.getElementById('reminderResult').innerHTML=html; }
+    function renderGlobalTodo() { let activeProjects = projects.filter(p=>p.status==='active'); let hasMissing = []; activeProjects.forEach(p=>{ let missingItems = p.deliverables.filter(d=>!d.exempt && d.submittedCount < d.quantity); if(missingItems.length>0) hasMissing.push({project:p, missing:missingItems}); }); if(hasMissing.length===0){document.getElementById('reminderResult').innerHTML='<div class="empty-reminder">🎉 所有进行中项目的交付件均已完成（豁免除外）</div>';return;} let html=''; hasMissing.forEach(({project,missing})=>{ let totalMissingCount = missing.reduce((s,d)=>s+(d.quantity-d.submittedCount),0); let itemsHtml = missing.map(d=>`<div class="deliverable-item incomplete">📄 ${escapeHtml(d.name)} 需补充 ${d.quantity-d.submittedCount} 份</div>`).join(''); html+=`<div class="reminder-item overdue"><div class="reminder-title"><span>⚠️ ${escapeHtml(project.name)}</span><span>结项: ${project.dueDate}</span></div><div class="deliverable-detail"><div class="deliverable-items">${itemsHtml}</div><div>📦 待办总数: ${totalMissingCount}</div></div></div>`; }); document.getElementById('reminderResult').innerHTML=html; }
+    
+    let filter = { name:'', manager:'', status:'all' };
+    function getFilteredProjects() { return projects.filter(p=> (filter.name==='' || p.name.toLowerCase().includes(filter.name.toLowerCase())) && (filter.manager==='' || (p.manager||'').toLowerCase().includes(filter.manager.toLowerCase())) && (filter.status==='all' || p.status===filter.status) ); }
+    function renderFilteredTable() { let filtered = getFilteredProjects(); let tbody=document.getElementById('projectTableBody'); if(filtered.length===0){ tbody.innerHTML='<tr><td colspan="6">暂无匹配项目</td></tr>'; document.getElementById('projectCount').innerText='0'; return; } document.getElementById('projectCount').innerText=filtered.length; let html=''; filtered.forEach(p=>{ let delHtml='<div class="deliverable-list">'; p.deliverables.forEach(d=>{ let exemptCls=d.exempt?'exempt':''; let exemptTxt=d.exempt?formatExemptReason(d.exemptReason):''; delHtml+=`<span class="deliverable-tag ${exemptCls}" title="${escapeHtml(d.remark||'')}">📄 ${escapeHtml(d.name)} (${d.submittedCount}/${d.quantity}) ${exemptTxt}</span>`; }); delHtml+='</div>'; let statusCls=p.status==='active'?'status-active':'status-completed'; let statusTxt=p.status==='active'?'进行中':'已结项'; html+=`<tr><td><strong>${escapeHtml(p.name)}</strong></td><td>${escapeHtml(p.dueDate)}</td><td>${escapeHtml(p.manager)}</td><td>${delHtml}</td><td><span class="status-badge ${statusCls}">${statusTxt}</span></td><td><button class="btn-icon edit-project" data-id="${p.id}">✏️</button><button class="btn-icon delete-project" data-id="${p.id}">🗑️</button></td></tr>`; }); tbody.innerHTML=html; attachTableEvents(); }
+    function attachTableEvents(){ document.querySelectorAll('.edit-project').forEach(btn=>btn.addEventListener('click',()=>openEditModal(parseInt(btn.dataset.id)))); document.querySelectorAll('.delete-project').forEach(btn=>btn.addEventListener('click',()=>{if(confirm('删除项目?')){projects=projects.filter(p=>p.id!==parseInt(btn.dataset.id));saveToLocal();}})); }
+    function updateStats(){ let total=projects.length; let active=projects.filter(p=>p.status==='active').length; let today=new Date(); let overdue=projects.filter(p=>p.status==='active' && new Date(p.dueDate)<today).length; let pending=0; projects.forEach(p=>{if(p.status==='active'){p.deliverables.forEach(d=>{if(!d.exempt) pending+=Math.max(0,d.quantity-d.submittedCount);});}}); document.getElementById('totalProjects').innerText=total; document.getElementById('activeProjects').innerText=active; document.getElementById('overdueProjects').innerText=overdue; document.getElementById('pendingDeliverables').innerText=pending; }
+    function renderChangeLog(){ let container=document.getElementById('changeLogContainer'); let logs=[]; projects.forEach(p=>{if(p.dueDateHistory?.length){p.dueDateHistory.forEach(h=>logs.push({name:p.name,old:h.oldDate,new:h.newDate,time:h.changeTime}));}}); if(logs.length===0){container.style.display='none';return;} logs.sort((a,b)=>new Date(b.time)-new Date(a.time)); container.style.display='block'; let html='<div>📅 结项时间变更记录</div><ul>'; logs.slice(0,6).forEach(l=>{html+=`<li>📌 ${escapeHtml(l.name)} : ${l.old} → ${l.new} (${new Date(l.time).toLocaleString()})</li>`;}); html+='</ul>'; container.innerHTML=html; }
+    function escapeHtml(str){ if(!str) return ''; return String(str).replace(/[&<>]/g,function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
+    
+    // 新增带其他原因的动态行构建
+    function addDeliverableRow(name='', qty=1, sub=0, exempt=false, exemptReason='') {
+        let cont = document.getElementById('deliverablesContainer');
+        let div = document.createElement('div'); div.className = 'deliverable-row';
+        let otherInputValue = '';
+        let selectedVal = '信息安全';
+        if(exemptReason === '外部原因') selectedVal = '外部原因';
+        else if(exemptReason && exemptReason.startsWith('其他:')) { selectedVal = '其他'; otherInputValue = exemptReason.substring(3); }
+        else if(['信息安全','数据安全','问题实际已闭环'].includes(exemptReason)) selectedVal = exemptReason;
+        else if(exemptReason && exemptReason !== '') selectedVal = '其他';
+        let innerHtml = `<input type="text" placeholder="交付件名称" value="${escapeHtml(name)}" class="deliv-name"><input type="number" min="1" value="${qty}" class="deliv-qty" style="width:80px"><input type="number" min="0" value="${sub}" class="deliv-submitted" style="width:80px"><div class="exempt-controls"><label><input type="checkbox" class="deliv-exempt" ${exempt?'checked':''}> 豁免</label><div class="exempt-reason-area" style="display:${exempt?'inline-flex':'none'}"><select class="exempt-reason-select"><option value="信息安全">信息安全</option><option value="数据安全">数据安全</option><option value="问题实际已闭环">问题实际已闭环</option><option value="外部原因">外部原因</option><option value="其他">其他</option></select><input type="text" class="other-reason-input" placeholder="请填写具体原因" value="${escapeHtml(otherInputValue)}" style="display:${selectedVal==='其他'?'inline-block':'none'};"></div></div><button type="button" class="remove-deliv">✖️</button>`;
+        div.innerHTML = innerHtml;
+        let chk = div.querySelector('.deliv-exempt');
+        let reasonArea = div.querySelector('.exempt-reason-area');
+        let select = div.querySelector('.exempt-reason-select');
+        let otherInput = div.querySelector('.other-reason-input');
+        if(selectedVal) select.value = selectedVal;
+        function updateOtherVisibility() { otherInput.style.display = select.value === '其他' ? 'inline-block' : 'none'; }
+        select.addEventListener('change', updateOtherVisibility);
+        chk.addEventListener('change', () => { reasonArea.style.display = chk.checked ? 'inline-flex' : 'none'; if(!chk.checked) otherInput.value = ''; });
+        div.querySelector('.remove-deliv').addEventListener('click', () => div.remove());
+        cont.appendChild(div);
+        updateOtherVisibility();
+    }
+
+    function collectDeliverables(){
+        let rows = document.querySelectorAll('#deliverablesContainer .deliverable-row');
+        let res = [];
+        for(let row of rows){
+            let name = row.querySelector('.deliv-name').value.trim();
+            if(!name) continue;
+            let qty = parseInt(row.querySelector('.deliv-qty').value)||1;
+            let sub = parseInt(row.querySelector('.deliv-submitted').value)||0;
+            let exempt = row.querySelector('.deliv-exempt').checked;
+            let exemptReasonFinal = '';
+            if(exempt){
+                let select = row.querySelector('.exempt-reason-select');
+                let reasonVal = select.value;
+                if(reasonVal === '其他'){
+                    let otherTxt = row.querySelector('.other-reason-input').value.trim();
+                    if(otherTxt === '') { alert(`交付件“${name}”选择【其他】豁免原因，请填写具体原因`); return null; }
+                    exemptReasonFinal = `其他: ${otherTxt}`;
+                } else {
+                    exemptReasonFinal = reasonVal;
+                }
+                if(!exemptReasonFinal && reasonVal !== '其他') exemptReasonFinal = reasonVal;
+                if(!exemptReasonFinal) { alert(`交付件“${name}”豁免原因不能为空`); return null; }
+            }
+            if(sub > qty) sub = qty;
+            res.push({name, quantity:qty, submittedCount:sub, exempt, exemptReason: exemptReasonFinal, remark:''});
+        }
+        return res;
+    }
+
+    function openEditModal(id){
+        let proj = projects.find(p=>p.id===id);
+        if(!proj) return;
+        window.editingId = id;
+        document.getElementById('projName').value = proj.name;
+        document.getElementById('projManager').value = proj.manager||'';
+        document.getElementById('projDueDate').value = proj.dueDate;
+        document.getElementById('projStatus').value = proj.status;
+        let container = document.getElementById('deliverablesContainer');
+        container.innerHTML = '';
+        proj.deliverables.forEach(d => addDeliverableRow(d.name, d.quantity, d.submittedCount, d.exempt, d.exemptReason||''));
+        if(proj.deliverables.length===0) addDeliverableRow('',1,0,false,'');
+        document.getElementById('projectModal').style.display = 'flex';
+    }
+    function saveProject(){
+        let name = document.getElementById('projName').value.trim();
+        let manager = document.getElementById('projManager').value;
+        let dueDate = document.getElementById('projDueDate').value;
+        let status = document.getElementById('projStatus').value;
+        if(!name||!dueDate){alert('请填写项目名称和结项日期');return;}
+        let deliverables = collectDeliverables();
+        if(deliverables===null) return;
+        if(window.editingId===null){
+            let newId = Date.now();
+            projects.push({id:newId, name, manager, dueDate, status, deliverables, dueDateHistory:[]});
+        } else {
+            let idx = projects.findIndex(p=>p.id===window.editingId);
+            if(idx!==-1){
+                let oldDue = projects[idx].dueDate;
+                if(oldDue !== dueDate){
+                    if(!projects[idx].dueDateHistory) projects[idx].dueDateHistory=[];
+                    projects[idx].dueDateHistory.push({oldDate:oldDue, newDate:dueDate, changeTime:new Date().toISOString()});
+                }
+                projects[idx] = {...projects[idx], name, manager, dueDate, status, deliverables};
+            }
+        }
+        saveToLocal();
+        closeModal();
+    }
+    function closeModal(){ document.getElementById('projectModal').style.display='none'; window.editingId=null; }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+        loadProjects();
+        let today=new Date(); let ym=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+        document.getElementById('reminderMonth').value=ym;
+        document.getElementById('monthlyReminderBtn').addEventListener('click',()=>{ currentReminderMode='monthly'; document.getElementById('monthlyReminderBtn').classList.add('active'); document.getElementById('globalTodoBtn').classList.remove('active'); refreshReminderByMode(); });
+        document.getElementById('globalTodoBtn').addEventListener('click',()=>{ currentReminderMode='global'; document.getElementById('globalTodoBtn').classList.add('active'); document.getElementById('monthlyReminderBtn').classList.remove('active'); refreshReminderByMode(); });
+        document.getElementById('reminderMonth').addEventListener('change',()=>{ if(currentReminderMode==='monthly') refreshReminderByMode(); });
+        document.getElementById('openAddProjectBtn').addEventListener('click',()=>{ window.editingId=null; document.getElementById('projName').value=''; document.getElementById('projManager').value=''; document.getElementById('projDueDate').value=''; document.getElementById('projStatus').value='active'; document.getElementById('deliverablesContainer').innerHTML=''; addDeliverableRow('',1,0,false,''); document.getElementById('projectModal').style.display='flex'; });
+        document.getElementById('closeModalBtn').addEventListener('click',closeModal);
+        document.getElementById('cancelModalBtn').addEventListener('click',closeModal);
+        document.getElementById('saveProjectBtn').addEventListener('click',saveProject);
+        document.getElementById('addDeliverableBtn').addEventListener('click',()=>addDeliverableRow('',1,0,false,''));
+        window.addEventListener('click',(e)=>{ if(e.target===document.getElementById('projectModal')) closeModal(); });
+        document.getElementById('searchNameInput').addEventListener('input',(e)=>{ filter.name=e.target.value; renderFilteredTable(); });
+        document.getElementById('searchManagerInput').addEventListener('input',(e)=>{ filter.manager=e.target.value; renderFilteredTable(); });
+        document.getElementById('statusFilter').addEventListener('change',(e)=>{ filter.status=e.target.value; renderFilteredTable(); });
+        refreshReminderByMode(); updateStats();
+    });
+</script>
+</body>
+</html>
